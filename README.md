@@ -2,6 +2,8 @@
 
 `lein with-profile dev run`
 
+1. setup db
+
 ## Getting Started
 
 1. Start the application: `lein run`

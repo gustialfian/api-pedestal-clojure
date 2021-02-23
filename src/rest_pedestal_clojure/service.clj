@@ -3,56 +3,14 @@
             [io.pedestal.http.route :as route]
             [io.pedestal.http.body-params :as body-params]
             [ring.util.response :as ring-resp]
-            [clojure.data.json :as json]
-            [clojure.java.jdbc :as jdbc]))
 
-
-(def pg-db {:dbtype "postgresql"
-            :dbname "sandbox"
-            :host "localhost"
-            :port 6543
-            :user "sandbox"
-            :password "sandbox"
-            :ssl false
-            :sslfactory "org.postgresql.ssl.NonValidatingFactory"})
-
-(defn find-todo []
-  (jdbc/query pg-db
-    ["select * from todo"]))
+            [rest-pedestal-clojure.todo :as todo]
+            ))
 
 (defn hello-index-handler [request]
   {:status  200
    :headers {"Content-Type" "application/json"}
    :body    "Safe."})
-
-(defn todo-index-handler [request]
-  (clojure.pprint/pprint (find-todo))
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    (json/write-str {:msg "hello"})})
-
-(defn todo-find-handler [request]
-  (clojure.pprint/pprint (-> request :path-params))
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    "todo-find-handler"})
-
-(defn todo-insert-handler [request]
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    "todo-insert-handler"})
-
-(defn todo-update-handler [request]
-  (clojure.pprint/pprint (-> request :path-params))
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    "todo-update-handler"})
-
-(defn todo-delete-handler [request]
-  (clojure.pprint/pprint (-> request :path-params))
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    "todo-delete-handler"})
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
@@ -61,11 +19,11 @@
 
 ;; Tabular routes
 (def routes #{["/"         :get     (conj common-interceptors `hello-index-handler)]
-              ["/todo"     :get     (conj common-interceptors `todo-index-handler)]
-              ["/todo/:id" :get     (conj common-interceptors `todo-find-handler)]
-              ["/todo"     :post    (conj common-interceptors `todo-insert-handler)]
-              ["/todo/:id" :put     (conj common-interceptors `todo-update-handler)]
-              ["/todo/:id" :delete  (conj common-interceptors `todo-delete-handler)]})
+              ["/todo"     :get     (conj common-interceptors `todo/index-handler)]
+              ["/todo/:id" :get     (conj common-interceptors `todo/find-handler)]
+              ["/todo"     :post    (conj common-interceptors `todo/insert-handler)]
+              ["/todo/:id" :put     (conj common-interceptors `todo/update-handler)]
+              ["/todo/:id" :delete  (conj common-interceptors `todo/delete-handler)]})
 
 ;; Map-based routes
 ;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
